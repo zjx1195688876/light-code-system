@@ -1,0 +1,12 @@
+.side-bar-block {
+  margin-bottom: 15px;
+}
+.side-bar-block h1 {
+  text-align: center;
+  font-size: 14px;
+  font-weight: bold;
+}
+.side-bar-block-item {
+  text-align: center;
+  font-size: 14px;
+}
