@@ -29,3 +29,33 @@ label {
   display: block;
   margin: 10px 0;
 }
+
+/* layout */
+.ant-layout-header_extend {
+  height: 50px;
+  line-height: 50px;
+  color: #fff;
+  font-size: 16px;
+}
+.ant-layout-content {
+  padding: 0 0 25px;
+}
+.download-button-box {
+  display: block;
+  margin: 30px auto 0;
+  text-align: center;
+}
+.download-button-box .download-button {
+  margin: 0 10px;
+}
+.ant-layout-content_extend-property {
+  margin: 10px;
+  flex: 0 0 200px;
+  height: 672px;
+  border: 2px dotted #e0e0e0;
+}
+.ant-layout-content_extend-property .property-title {
+  margin: 10px;
+  font-size: 18px;
+  text-align: center;
+}

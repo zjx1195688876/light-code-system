@@ -1,58 +1,47 @@
 import React from 'react';
-import Header from './components/header/index';
+import { Layout, Menu, Button, Modal } from 'antd';
 // import LayoutTest from './layout/layout-test/index';
 import COMPONENTS_GENERATE_FUNCTION from './config/constant';
-import 'zent/css/index.css';
+import 'antd/dist/antd.css';
 import './App.css';
+
+const { Header, Sider, Content } = Layout;
 
 class App extends React.Component {
   constructor(props) {
     super(props);
-    console.log('props: ', props);
     this.state = {
       config: {
         text: '按钮文字',
         type: 'primary',
-        onClickButton: this.onClickButton.bind(this),
         onChangeText: this.onChangeText.bind(this),
         onChangeType: this.onChangeType.bind(this),
       },
-      section1: {
+      section: {
         string: '',
         eleemnt: {},
         property: null,
       },
-      section2: {
-        string: '',
-        eleemnt: {},
-        property: null,
-      },
-      propertyBlock: null,
+
+      isShowComponentModal: false,
     };
   }
 
-  selectCopmponent = e => {
-    console.log('key: ', e.currentTarget.dataset.key);
+  onClickMenuItem = data => {
+    console.log('data: ', data);
+    console.log('key: ', data.key);
   }
   
   // 核心：数据流的管理
-  addCopmponent = e => {
-    const id = e.currentTarget.dataset.id;
-    if (id === 'section_1') {
-      const { string, element, property } = COMPONENTS_GENERATE_FUNCTION('button')(this.state.config);
-      this.setState({
-        section1: {
-          string,
-          element,
-          property,
-        },
-      });
-      console.log('string: ', string);
-    }
-  }
-
-  onClickButton = e => {
-    e.stopPropagation();
+  onAddCopmponent = type => {
+    const { string, element, property } = COMPONENTS_GENERATE_FUNCTION(type)(this.state.config);
+    this.setState({
+      section: {
+        string,
+        element,
+        property,
+      },
+    });
   }
 
   onChangeText = e => {
@@ -60,12 +49,13 @@ class App extends React.Component {
     config.text = e.currentTarget.value;
     const { string, element, property } = COMPONENTS_GENERATE_FUNCTION('button')(config);
     this.setState({
-      section1: {
+      section: {
         string,
         element,
         property,
       },
     });
+    console.log('string: ', string);
   }
 
   onChangeType = e => {
@@ -73,7 +63,7 @@ class App extends React.Component {
     config.type = e.currentTarget.value;
     const { string, element, property } = COMPONENTS_GENERATE_FUNCTION('button')(config);
     this.setState({
-      section1: {
+      section: {
         string,
         element,
         property,
@@ -81,7 +71,14 @@ class App extends React.Component {
     });
   }
 
-  downLoadFile = (content, filename) => {
+  onToggleComponentModal = (type = false) => {
+    this.setState({
+      isShowComponentModal: type,
+    });
+  }
+  
+
+  onDownLoadFile = (content, filename) => {
     // 创建隐藏的可下载链接
     const eleLink = document.createElement('a');
     eleLink.download = filename;
@@ -99,33 +96,68 @@ class App extends React.Component {
   render() {
     return (
       <>
-        <Header />
-        {/* <SideBar SideBarList = { SideBarList }/> */}
-        <div className="container">
-          <div className="side-bar">
-            <span className="side-bar-item" data-key="key_1" onClick={this.selectCopmponent}>组件1</span>
-            <span className="side-bar-item" data-key="key_2" onClick={this.selectCopmponent}>组件2</span>
-            <span className="side-bar-item" data-key="key_3" onClick={this.selectCopmponent}>组件3</span>
-            <span className="side-bar-item" data-key="key_4" onClick={this.selectCopmponent}>组件4</span>
-            <span className="side-bar-item" data-key="key_5" onClick={this.selectCopmponent}>组件5</span>
-          </div>
-          <div className="main">
-            {/* 代码生成区和预览区 开始 */}
-            <div className="section" data-id="section_1" onClick={this.addCopmponent}>
-              {this.state.section1.element}
-            </div>
-            <div className="section" data-id="section_2" onClick={this.addCopmponent}>
-              {/* <!-- layout-slot --> */}
-            </div>
-            {/* 代码生成区和预览区 结束 */}
+        <Layout>
+          <Header className="ant-layout-header_extend">代码生成平台</Header>
+          <Layout>
+            <Sider>
+              <Menu
+                mode="inline"
+                theme="dark"
+                defaultSelectedKeys={['page']}
+                style={{ lineHeight: '64px' }}
+              >
+                <Menu.Item key="page" onClick={this.onClickMenuItem}>页面</Menu.Item>
+                <Menu.Item key="layout" onClick={this.onClickMenuItem}>布局</Menu.Item>
+                <Menu.Item key="component" onClick={this.onClickMenuItem}>物料</Menu.Item>
+              </Menu>
+            </Sider>
+            <Content>
+              {/* 代码生成区和预览区 开始 */}
+              <div className="section" data-id="section_1">
+                {this.state.section.element}
+              </div>
+              {/* 代码生成区和预览区 结束 */}
 
-            <button onClick={() => this.downLoadFile(this.state.section1.string, 'button.js')}>点击下载</button>
-          </div>
-          <div className="property">
-            <h2 className="property-title">属性</h2>
-            {this.state.section1.property}
-          </div>
-        </div>
+              <div className="download-button-box">
+                <Button
+                  className="download-button"
+                  type="primary"
+                  shape="round"
+                  icon="plus"
+                  onClick={() => this.onToggleComponentModal(true)}
+                >
+                  添加组件
+                </Button>
+                <Button
+                  className="download-button"
+                  type="primary"
+                  shape="round"
+                  icon="download"
+                  onClick={() => this.onDownLoadFile(this.state.section.string, 'button.js')}
+                >
+                  点击下载
+                </Button>
+              </div>
+            </Content>
+            <Content className="ant-layout-content_extend-property">
+              <h2 className="property-title">属性</h2>
+              {this.state.section.property}
+            </Content>
+          </Layout>
+        </Layout>
+
+        <Modal
+          title="选择组件"
+          visible={this.state.isShowComponentModal}
+          onOk={() => this.onToggleComponentModal(false)}
+          onCancel={() => this.onToggleComponentModal(false)}
+          okText="确认"
+          cancelText="取消"
+        >
+          <p onClick={() => this.onAddCopmponent('button')}>按钮</p>
+          <p onClick={() => this.onAddCopmponent('input')}>输入框</p>
+          <p onClick={() => this.onAddCopmponent('table')}>表格</p>
+        </Modal>
       </>
     );
   }

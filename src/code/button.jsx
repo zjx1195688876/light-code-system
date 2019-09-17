@@ -1,12 +1,12 @@
 import React from 'react';
-import { Button } from 'zent';
+import { Button } from 'antd';
 
 const generateButton = config => {
   const string = `
     <Button type=${config.type}>${config.text}</Button>
   `;
   const element = (
-    <Button type={config.type} onClick={config.onClickButton}>{config.text}</Button>
+    <Button type={config.type}>{config.text}</Button>
   );
   const property = (
     <>
