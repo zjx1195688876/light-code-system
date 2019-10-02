@@ -9,11 +9,11 @@ class LayoutTest extends React.Component {
     this.state = {
       section1: {
         string: '',
-        eleemnt: {},
+        element: {},
       },
       section2: {
         string: '',
-        eleemnt: {},
+        element: {},
       },
     };
   }

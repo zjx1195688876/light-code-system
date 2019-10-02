@@ -19,7 +19,7 @@ class App extends React.Component {
       },
       section: {
         string: '',
-        eleemnt: {},
+        element: null,
         property: null,
       },
 
@@ -76,7 +76,6 @@ class App extends React.Component {
       isShowComponentModal: type,
     });
   }
-  
 
   onDownLoadFile = (content, filename) => {
     // 创建隐藏的可下载链接
