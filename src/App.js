@@ -1,28 +1,19 @@
 import React from 'react';
-import { Layout, Menu, Button, Modal } from 'antd';
-// import LayoutTest from './layout/layout-test/index';
-import COMPONENTS_GENERATE_FUNCTION from './config/constant';
+import Components from './components/index';
+// import generateCode from './components_render/index';
 import 'antd/dist/antd.css';
 import './App.css';
 
+const antd = require('antd'); // 为了使用React.createElement(antd[type])的方式生成代码，只能用commonJs的方式引入
+const { Layout, Menu, Button, Modal, Input, Select } = antd;
 const { Header, Sider, Content } = Layout;
+const { Option } = Select;
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      config: {
-        text: '按钮文字',
-        type: 'primary',
-        onChangeText: this.onChangeText.bind(this),
-        onChangeType: this.onChangeType.bind(this),
-      },
-      section: {
-        string: '',
-        element: null,
-        property: null,
-      },
-
+      currentComponent: {}, // 当前选中的组件
       isShowComponentModal: false,
     };
   }
@@ -34,40 +25,9 @@ class App extends React.Component {
   
   // 核心：数据流的管理
   onAddCopmponent = type => {
-    const { string, element, property } = COMPONENTS_GENERATE_FUNCTION(type)(this.state.config);
+    console.log('type: ', type);
     this.setState({
-      section: {
-        string,
-        element,
-        property,
-      },
-    });
-  }
-
-  onChangeText = e => {
-    let config = this.state.config;
-    config.text = e.currentTarget.value;
-    const { string, element, property } = COMPONENTS_GENERATE_FUNCTION('button')(config);
-    this.setState({
-      section: {
-        string,
-        element,
-        property,
-      },
-    });
-    console.log('string: ', string);
-  }
-
-  onChangeType = e => {
-    let config = this.state.config;
-    config.type = e.currentTarget.value;
-    const { string, element, property } = COMPONENTS_GENERATE_FUNCTION('button')(config);
-    this.setState({
-      section: {
-        string,
-        element,
-        property,
-      },
+      currentComponent: Components[type] || {}
     });
   }
 
@@ -78,18 +38,69 @@ class App extends React.Component {
   }
 
   onDownLoadFile = (content, filename) => {
-    // 创建隐藏的可下载链接
-    const eleLink = document.createElement('a');
-    eleLink.download = filename;
-    eleLink.style.display = 'none';
-    // 字符内容转变成blob地址
-    const blob = new Blob([content]);
-    eleLink.href = URL.createObjectURL(blob);
-    // 触发点击
-    document.body.appendChild(eleLink);
-    eleLink.click();
-    // 然后移除
-    document.body.removeChild(eleLink);
+    console.log('下载文件');
+  }
+
+  onChangeSelect = (val, key) => {
+    const props = Object.assign({}, this.state.currentComponent.props, { [key]: val });
+    const currentComponent = Object.assign({}, this.state.currentComponent, { props });
+
+    this.setState({ // 更新对象某个值的时候要这样更新
+      currentComponent
+    });
+  }
+
+  onChangeInput = (e, key) => {
+    const props = Object.assign({}, this.state.currentComponent.props, { [key]: e.target.value });
+    const currentComponent = Object.assign({}, this.state.currentComponent, { props });
+
+    this.setState({ // 更新对象某个值的时候要这样更新
+      currentComponent
+    });
+  }
+
+  // parseComponent = () => {
+  //   const type = this.state.currentComponent.type;
+  //   const props = this.state.currentComponent.props;
+    
+  //   return generateCode(type)(props);
+  // }
+
+  renderProps = () => {
+    const { type, props } = this.state.currentComponent;
+
+    return type ? React.createElement(
+      antd[type],
+      props,
+      props.text ? props.text : null
+    ) : null;
+  }
+
+  // 右侧的属性渲染，以及属性的变更
+  renderConfig = () => {
+    const { props, config } = this.state.currentComponent;
+    const configDOM = [];
+    for (let key in config) {
+      let label = null;
+      if (config[key].enum) { // 存在枚举类型，则用select
+        label = <label key={key}>
+          {config[key].label}：
+          <Select defaultValue={props[key]} style={{ width: 200 }} onChange={val => {this.onChangeSelect(val, key)}}>
+            {config[key].enum.map(item => {
+              return <Option key={item} value={item}>{item}</Option>;
+            })}
+          </Select>
+        </label>;
+      } else { // 否则使用input框
+        label = <label key={key}>{
+          config[key].label}：
+          <Input value={props[key]} onChange={e => {this.onChangeInput(e, key)}} />
+        </label>;
+      }
+      configDOM.push(label);
+    }
+
+    return configDOM;
   }
 
   render() {
@@ -113,7 +124,7 @@ class App extends React.Component {
             <Content>
               {/* 代码生成区和预览区 开始 */}
               <div className="section" data-id="section_1">
-                {this.state.section.element}
+                { this.renderProps() }
               </div>
               {/* 代码生成区和预览区 结束 */}
 
@@ -140,7 +151,7 @@ class App extends React.Component {
             </Content>
             <Content className="ant-layout-content_extend-property">
               <h2 className="property-title">属性</h2>
-              {this.state.section.property}
+              {this.renderConfig()}
             </Content>
           </Layout>
         </Layout>
@@ -153,9 +164,9 @@ class App extends React.Component {
           okText="确认"
           cancelText="取消"
         >
-          <p onClick={() => this.onAddCopmponent('button')}>按钮</p>
-          <p onClick={() => this.onAddCopmponent('input')}>输入框</p>
-          <p onClick={() => this.onAddCopmponent('table')}>表格</p>
+          <p onClick={() => this.onAddCopmponent('VisButton')}>按钮</p>
+          <p onClick={() => this.onAddCopmponent('VisInput')}>输入框</p>
+          <p onClick={() => this.onAddCopmponent('VisTable')}>表格</p>
         </Modal>
       </>
     );
