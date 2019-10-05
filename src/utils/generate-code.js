@@ -41,6 +41,7 @@ const _getContent = config => {
     }
   `;
 };
+
 const generateCode = (config, fileName) => {
   const content = _getContent(config);
   // 创建隐藏的可下载链接
