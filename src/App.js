@@ -4,7 +4,7 @@ import Components from './components/index';
 import 'antd/dist/antd.css';
 import { HOCButton } from './hoc-components/index';
 import './App.css';
-import { generateCode } from './utils';
+import { generateCode, setBooleanToString, setStringToBoolean } from './utils';
 
 const antd = require('antd'); // 为了使用React.createElement(antd[type])的方式生成代码，只能用commonJs的方式引入
 const { Layout, Menu, Modal, Input, Select } = antd;
@@ -78,6 +78,7 @@ class App extends React.Component {
 
   // 右侧属性更新枚举类型
   onChangeSelect = (val, key) => {
+    val = setStringToBoolean(val);
     const { allComponent } = this.state;
     let [currentComponent] = allComponent.filter(component => component.isSelected);
     const index = allComponent.indexOf(currentComponent);
@@ -176,13 +177,12 @@ class App extends React.Component {
         antd[type],
         {
           ...props,
-          key: index,
-          onClick: () => { this.selectComponent(component) }
+          key: index
         },
         props.text ? props.text : null
       ) : null;
 
-      return <div style={{margin: "0 0 15px"}}>{componentElement}</div>
+      return <div key={index} style={{margin: "0 0 15px"}} onClick={() => {this.selectComponent(component)}}>{componentElement}</div>
     });
 
     return arr;
@@ -220,9 +220,10 @@ class App extends React.Component {
       if (config[key].enum) { // 存在枚举类型，则用select
         label = <label key={key}>
           {config[key].label}：
-          <Select defaultValue={props[key]} style={{ width: 200 }} onChange={val => {this.onChangeSelect(val, key)}}>
+          {/* 因为antd的selct不支持Boolean类型的value，所以遇到Boolean类型的value先转为string，到时候再通过setStringToBoolean转回来 */}
+          <Select defaultValue={setBooleanToString(props[key])} style={{ width: 200 }} onChange={val => {this.onChangeSelect(val, key)}}>
             {config[key].enum.map(item => {
-              return <Option key={item} value={item}>{item}</Option>;
+              return <Option key={item} value={setBooleanToString(item)}>{String(item)}</Option>;
             })}
           </Select>
         </label>;

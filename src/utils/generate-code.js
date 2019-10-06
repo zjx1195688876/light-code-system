@@ -1,3 +1,4 @@
+import { isObjectLike } from 'lodash';
 const boolEnum = [true, false, null, undefined];
 
 const _getContent = config => {
@@ -7,7 +8,9 @@ const _getContent = config => {
     for (let key in item.props) {
       if (item.props[key] !== null) {
         if (boolEnum.indexOf(item.props[key]) > -1) { // 布尔类型
-          props += `${key}=${item.props[key]} `;
+          props += `${key}={${item.props[key]}} `;
+        } else if (isObjectLike(item.props[key])) { // 数组或对象等类对象类型
+          props += `${key}={${JSON.stringify(item.props[key])}} `;
         } else {
           props += `${key}="${item.props[key]}" `;
         }
