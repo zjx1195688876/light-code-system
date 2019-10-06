@@ -41,6 +41,7 @@ body {
 }
 .section {
   margin: 10px;
+  padding: 10px;
   height: 672px;
   cursor: pointer;
   border: 2px dotted #e0e0e0;

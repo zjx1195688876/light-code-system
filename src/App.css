@@ -59,3 +59,9 @@ label {
   font-size: 18px;
   text-align: center;
 }
+.ant-layout-content_extend-property .delete-button,
+.ant-layout-content_extend-property .move-button
+{
+  display: block;
+  margin: 10px auto;
+}

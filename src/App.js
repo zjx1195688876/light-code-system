@@ -2,13 +2,15 @@ import React from 'react';
 import Components from './components/index';
 // import generateCode from './components_render/index';
 import 'antd/dist/antd.css';
+import { HOCButton } from './hoc-components/index';
 import './App.css';
 import { generateCode } from './utils';
 
 const antd = require('antd'); // 为了使用React.createElement(antd[type])的方式生成代码，只能用commonJs的方式引入
-const { Layout, Menu, Button, Modal, Input, Select } = antd;
+const { Layout, Menu, Modal, Input, Select } = antd;
 const { Header, Sider, Content } = Layout;
 const { Option } = Select;
+const { info } = Modal;
 
 class App extends React.Component {
   constructor(props) {
@@ -78,11 +80,11 @@ class App extends React.Component {
   onChangeSelect = (val, key) => {
     const { allComponent } = this.state;
     let [currentComponent] = allComponent.filter(component => component.isSelected);
+    const index = allComponent.indexOf(currentComponent);
     const props = Object.assign({}, currentComponent.props, { [key]: val });
     currentComponent = Object.assign({}, currentComponent, { props });
-    const index = currentComponent.index;
 
-    allComponent.splice(index-1, 1, currentComponent);
+    allComponent.splice(index, 1, currentComponent);
 
     this.setState({
       allComponent
@@ -93,11 +95,11 @@ class App extends React.Component {
   onChangeInput = (e, key) => {
     const { allComponent } = this.state;
     let [currentComponent] = allComponent.filter(component => component.isSelected);
+    const index = allComponent.indexOf(currentComponent);
     const props = Object.assign({}, currentComponent.props, { [key]: e.target.value });
     currentComponent = Object.assign({}, currentComponent, { props });
-    const index = currentComponent.index;
 
-    allComponent.splice(index-1, 1, currentComponent); // splice改变数组自身
+    allComponent.splice(index, 1, currentComponent); // splice改变数组自身
 
     this.setState({
       allComponent
@@ -109,6 +111,47 @@ class App extends React.Component {
     // this.setState({ // 更新对象某个值的时候要这样更新
     //   currentComponent
     // });
+  }
+
+  onDeleteCurrentComponent = () => {
+    const { allComponent } = this.state;
+    let [currentComponent] = allComponent.filter(component => component.isSelected);
+    const index = allComponent.indexOf(currentComponent);
+
+    allComponent.splice(index, 1); // 删除元素
+
+    this.setState({
+      allComponent
+    });
+  }
+
+  onMoveCurrentComponent = (direction) => {
+    const { allComponent } = this.state;
+    let [currentComponent] = allComponent.filter(component => component.isSelected);
+    const index = allComponent.indexOf(currentComponent); // 当前选中的组件在数组中的位置
+    if (direction === 'up') {
+      if (index === 0) {
+        info({
+          content: '当前元素已经是第一位'
+        });
+        return;
+      }
+      allComponent[index] = allComponent[index-1];
+      allComponent[index-1] = currentComponent;
+    } else if(direction === 'down') {
+      if (index === allComponent.length - 1) {
+        info({
+          content: '当前元素已经是最后一位'
+        });
+        return;
+      }
+      allComponent[index] = allComponent[index+1];
+      allComponent[index+1] = currentComponent;
+    }
+
+    this.setState({
+      allComponent
+    });
   }
 
   // parseComponent = () => {
@@ -126,7 +169,10 @@ class App extends React.Component {
 
     const arr = allComponent.map((component, index) => {
       const { type, props } = component;
-      return type ? React.createElement(
+      /* 没有直接将React.createElement返回的原因是因为，用<div>包裹之后会更好看
+      * 当然，生成的代码是不会包含<div>的
+      */
+      const componentElement = type ? React.createElement(
         antd[type],
         {
           ...props,
@@ -135,6 +181,8 @@ class App extends React.Component {
         },
         props.text ? props.text : null
       ) : null;
+
+      return <div style={{margin: "0 0 15px"}}>{componentElement}</div>
     });
 
     return arr;
@@ -145,10 +193,10 @@ class App extends React.Component {
     this.resetSelectComponent();
     const { allComponent } = this.state;
     let [currentComponent] = allComponent.filter(component => component.index === selectedComponent.index);
+    const index = allComponent.indexOf(currentComponent);
     currentComponent = Object.assign({}, currentComponent, { isSelected: true });
-    const index = currentComponent.index;
 
-    allComponent.splice(index-1, 1, currentComponent); // splice改变数组自身
+    allComponent.splice(index, 1, currentComponent); // splice改变数组自身
 
     this.setState({
       allComponent
@@ -162,6 +210,9 @@ class App extends React.Component {
       return null;
     }
     const [currentComponent] = allComponent.filter(component => component.isSelected);
+    if (!currentComponent) { // 当前元素删除，直接返回null
+      return null;
+    }
     const { props, config } = currentComponent;
     const configDOM = [];
     for (let key in config) {
@@ -213,28 +264,50 @@ class App extends React.Component {
               {/* 代码生成区和预览区 结束 */}
 
               <div className="download-button-box">
-                <Button
+                <HOCButton
                   className="download-button"
-                  type="primary"
-                  shape="round"
                   icon="plus"
+                  text="添加组件"
                   onClick={() => this.onToggleComponentModal(true)}
-                >
-                  添加组件
-                </Button>
-                <Button
+                />
+                <HOCButton
                   className="download-button"
                   type="primary"
                   shape="round"
                   icon="download"
+                  text="点击下载"
                   onClick={() => this.onToggleFileModal(true)}
-                >
-                  点击下载
-                </Button>
+                />
               </div>
             </Content>
             <Content className="ant-layout-content_extend-property">
               <h2 className="property-title">属性</h2>
+              {this.state.allComponent.length > 0
+                ? <>
+                  <HOCButton
+                    className="delete-button"
+                    size="small"
+                    icon="delete"
+                    text="删除元素"
+                    onClick={this.onDeleteCurrentComponent}
+                  />
+                  <HOCButton
+                    className="move-button"
+                    size="small"
+                    icon="up"
+                    text="上移元素"
+                    onClick={() => this.onMoveCurrentComponent('up')}
+                  />
+                  <HOCButton
+                    className="move-button"
+                    size="small"
+                    icon="down"
+                    text="下移元素"
+                    onClick={() => this.onMoveCurrentComponent('down')}
+                  />
+                </>
+                : null
+              }
               {this.renderConfig()}
             </Content>
           </Layout>
