@@ -2,7 +2,8 @@ import { isObjectLike } from 'lodash';
 const boolEnum = [true, false, null, undefined];
 
 const _getContent = config => {
-  const components = config.map(item => item.type).join(', ');
+  const typeArr = config.map(item => item.type); // 当前选择了哪些组件
+  const components = Array.from(new Set(typeArr)).join(', '); // 组件去重
   const componentsReactNode = config.map(item => {
     let props = '';
     for (let key in item.props) {
