@@ -1,10 +1,10 @@
 import React from 'react';
-import Components from './components/index';
+import Components from '@/component/index';
 // import generateCode from './components_render/index';
 import 'antd/dist/antd.css';
-import { HOCButton } from './hoc-components/index';
-import './App.css';
-import { generateCode, setBooleanToString, setStringToBoolean } from './utils';
+import { HOCButton } from '@/hoc-component/index';
+import './Page.css';
+import { generateCode, setBooleanToString, setStringToBoolean } from '@/utils';
 
 const antd = require('antd'); // 为了使用React.createElement(antd[type])的方式生成代码，只能用commonJs的方式引入
 const { Layout, Menu, Modal, Input, Select } = antd;
@@ -12,7 +12,7 @@ const { Header, Sider, Content } = Layout;
 const { Option } = Select;
 const { info } = Modal;
 
-class App extends React.Component {
+class Page extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -342,4 +342,4 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default Page;
