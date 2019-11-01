@@ -28,5 +28,15 @@ export default function(app: EggAppConfig) {
     layout: path.join(app.baseDir, 'app/web/view/layout.html')
   };
 
+  exports.io = {
+    init: { }, // passed to engine.io
+    namespace: {
+      '/': {
+        connectionMiddleware: [],
+        packetMiddleware: [],
+      },
+    },
+  };
+
   return exports;
 }
