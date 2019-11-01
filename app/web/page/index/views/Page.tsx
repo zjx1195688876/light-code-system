@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import Components from '@/component/index';
 // import generateCode from './components_render/index';
 import 'antd/dist/antd.css';
@@ -12,7 +12,15 @@ const { Header, Sider, Content } = Layout;
 const { Option } = Select;
 const { info } = Modal;
 
-class Page extends React.Component {
+interface IState {
+  componentIndex: number; // 组件的唯一id，累加
+  allComponent: Array<Record<string, any>>; // 当前应用的组件集合
+  isShowComponentModal: boolean;
+  isShowFileModal: boolean;
+  fileName: string;
+}
+
+class Page extends React.Component<any, IState> {
   constructor(props) {
     super(props);
     this.state = {
@@ -24,12 +32,12 @@ class Page extends React.Component {
     };
   }
 
-  onClickMenuItem = data => {
+  onClickMenuItem = (data: { key: string }) => {
     console.log('data: ', data);
     console.log('key: ', data.key);
   }
   
-  onAddCopmponent = type => {
+  onAddCopmponent = (type: string) => {
     this.resetSelectComponent(); // 重置当前选中的组件
     let { allComponent, componentIndex } = this.state;
     componentIndex++; // 累加
@@ -44,43 +52,43 @@ class Page extends React.Component {
     });
   }
 
-  resetSelectComponent = () => {
+  resetSelectComponent = (): void => {
     const { allComponent } = this.state;
-    allComponent.map(component => {
+    allComponent.map((component: { isSelected: boolean }) => {
       return component.isSelected = false;
     });
   }
 
-  onToggleComponentModal = (type = false) => {
+  onToggleComponentModal = (type: boolean = false) => {
     this.setState({
       isShowComponentModal: type,
     });
   }
 
-  onToggleFileModal = (type = false) => {
+  onToggleFileModal = (type: boolean = false) => {
     this.setState({
       isShowFileModal: type,
     });
   }
 
-  onDownLoadFile = () => {
+  onDownLoadFile = (): void => {
     const { allComponent, fileName } = this.state;
     if (fileName) {
       generateCode(allComponent, fileName);
     }
   }
 
-  onChangeFileNameInput = e => {
+  onChangeFileNameInput = (e: { target: { value: string } }) => {
     this.setState({
       fileName: e.target.value || ''
     });
   }
 
   // 右侧属性更新枚举类型
-  onChangeSelect = (val, key) => {
+  onChangeSelect = (val: string, key: string) => {
     val = setStringToBoolean(val);
     const { allComponent } = this.state;
-    let [currentComponent] = allComponent.filter(component => component.isSelected);
+    let [currentComponent] = allComponent.filter((component) => component.isSelected);
     const index = allComponent.indexOf(currentComponent);
     const props = Object.assign({}, currentComponent.props, { [key]: val });
     currentComponent = Object.assign({}, currentComponent, { props });
@@ -93,9 +101,9 @@ class Page extends React.Component {
   }
   
   // 右侧属性更新input输入框
-  onChangeInput = (e, key) => {
+  onChangeInput = (e: { target: { value: string } }, key: string) => {
     const { allComponent } = this.state;
-    let [currentComponent] = allComponent.filter(component => component.isSelected);
+    let [currentComponent] = allComponent.filter((component: { isSelected: boolean }) => component.isSelected);
     const index = allComponent.indexOf(currentComponent);
     const props = Object.assign({}, currentComponent.props, { [key]: e.target.value });
     currentComponent = Object.assign({}, currentComponent, { props });
@@ -114,7 +122,7 @@ class Page extends React.Component {
     // });
   }
 
-  onDeleteCurrentComponent = () => {
+  onDeleteCurrentComponent = (): void => {
     const { allComponent } = this.state;
     let [currentComponent] = allComponent.filter(component => component.isSelected);
     const index = allComponent.indexOf(currentComponent);
@@ -126,7 +134,7 @@ class Page extends React.Component {
     });
   }
 
-  onMoveCurrentComponent = (direction) => {
+  onMoveCurrentComponent = (direction: string) => {
     const { allComponent } = this.state;
     let [currentComponent] = allComponent.filter(component => component.isSelected);
     const index = allComponent.indexOf(currentComponent); // 当前选中的组件在数组中的位置
@@ -162,13 +170,13 @@ class Page extends React.Component {
   //   return generateCode(type)(props);
   // }
 
-  renderProps = () => {
+  renderProps = (): ReactNode => {
     const { allComponent } = this.state;
     if (!allComponent.length) {
       return null;
     }
 
-    const arr = allComponent.map((component, index) => {
+    const arr = allComponent.map((component: { type: string, index: number,  props: { text: string } }, index: number) => {
       const { type, props } = component;
       /* 没有直接将React.createElement返回的原因是因为，用<div>包裹之后会更好看
       * 当然，生成的代码是不会包含<div>的
@@ -189,7 +197,7 @@ class Page extends React.Component {
   }
 
   // 点击组件，更换当前选中的组件
-  selectComponent = selectedComponent => {
+  selectComponent = ( selectedComponent: { index: number } ) => {
     this.resetSelectComponent();
     const { allComponent } = this.state;
     let [currentComponent] = allComponent.filter(component => component.index === selectedComponent.index);
@@ -204,7 +212,7 @@ class Page extends React.Component {
   }
 
   // 右侧的属性渲染，以及属性的变更
-  renderConfig = () => {
+  renderConfig = (): ReactNode => {
     const { allComponent } = this.state;
     if (!allComponent.length) {
       return null;
@@ -214,9 +222,9 @@ class Page extends React.Component {
       return null;
     }
     const { props, config } = currentComponent;
-    const configDOM = [];
+    const configDOM: Array<ReactNode> = [];
     for (let key in config) {
-      let label = null;
+      let label: ReactNode | ReactNode[] = null;
       if (config[key].enum) { // 存在枚举类型，则用select
         label = <label key={key}>
           {config[key].label}：
@@ -239,7 +247,7 @@ class Page extends React.Component {
     return configDOM;
   }
 
-  render() {
+  render(): ReactNode {
     return (
       <>
         <Layout>
