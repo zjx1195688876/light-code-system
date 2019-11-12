@@ -1,4 +1,5 @@
 import React, { ReactNode } from 'react';
+import socket from '@/socket';
 import Components from '@/component/index';
 // import generateCode from './components_render/index';
 import 'antd/dist/antd.css';
@@ -59,16 +60,20 @@ class Page extends React.Component<any, IState> {
     });
   }
 
-  onToggleComponentModal = (type: boolean = false) => {
+  onToggleComponentModal = (type: boolean = false): void => {
     this.setState({
       isShowComponentModal: type,
     });
   }
 
-  onToggleFileModal = (type: boolean = false) => {
+  onToggleFileModal = (type: boolean = false): void => {
     this.setState({
       isShowFileModal: type,
     });
+  }
+
+  onClickTestSocketIO = (): void => {
+    socket.emit('io.index.getWorkFolder');
   }
 
   onDownLoadFile = (): void => {
@@ -286,6 +291,14 @@ class Page extends React.Component<any, IState> {
                   icon="download"
                   text="点击下载"
                   onClick={() => this.onToggleFileModal(true)}
+                />
+                <HOCButton
+                  className="download-button"
+                  type="primary"
+                  shape="round"
+                  icon="download"
+                  text="测试socket.io"
+                  onClick={() => this.onClickTestSocketIO()}
                 />
               </div>
             </Content>

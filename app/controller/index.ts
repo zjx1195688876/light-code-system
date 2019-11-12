@@ -8,4 +8,4 @@ export default class HomeController extends Controller {
       message: { text: 'Ant Design Tab Theme and Code Spliting' }
     });
   }
-}
+};
