@@ -73,7 +73,8 @@ class Page extends React.Component<any, IState> {
   }
 
   onClickTestSocketIO = (): void => {
-    socket.emit('io.index.getWorkFolder');
+    const files = await socket.emit('io.index.getWorkFolder');
+    console.log('files: ', files);
   }
 
   onDownLoadFile = (): void => {
