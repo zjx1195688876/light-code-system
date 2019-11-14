@@ -72,7 +72,7 @@ class Page extends React.Component<any, IState> {
     });
   }
 
-  onClickTestSocketIO = (): void => {
+  onClickTestSocketIO = async () => {
     const files = await socket.emit('io.index.getWorkFolder');
     console.log('files: ', files);
   }
