@@ -27,7 +27,7 @@
     "egg-view-react-ssr": "^2.3.2",
     "extend": "~3.0.0",
     "history": "^4.7.2",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.21",
     "midway-mirror": "^1.11.6",
     "moment": "^2.17.1",
     "react": "^16.9.0",
