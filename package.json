@@ -65,7 +65,7 @@
     "ip": "^1.1.5",
     "less": "^2.7.2",
     "less-loader": "^4.0.5",
-    "node-sass": "^4.5.3",
+    "node-sass": "^7.0.0",
     "sass-loader": "^6.0.6",
     "ts-loader": "^4.0.0",
     "tslint": "^5.9.1",
